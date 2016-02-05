@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+						http://www.springframework.org/schema/context 
+						  http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                        http://www.springframework.org/schema/jdbc 
+                          http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd">
+
+
+    <context:component-scan base-package="dev.customer.persistence" />
+	
+	<context:property-placeholder location="classpath:database.properties" />
+
+	<jdbc:embedded-database id="dataSource" type="HSQL"> 
+	</jdbc:embedded-database>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="annotatedClasses">
+			<list>
+				<value>dev.customer.action.CustomerActionFactory</value>
+				<value>dev.customer.action.CustomerActionImpl</value> 
+				<value>dev.customer.entities.Corporation</value>
+				<value>dev.customer.entities.Bank</value>
+				<value>dev.customer.entities.Client</value>
+				<value>dev.customer.entities.ClientSession</value>
+			</list>
+		</property>
+		
+		<property name="dataSource" ref="dataSource" />
+		 
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+				<prop key="hibernate.show_sql">hibernate.show_sql</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="persistenceExceptionTranslationPostProcessor"
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+</beans>
